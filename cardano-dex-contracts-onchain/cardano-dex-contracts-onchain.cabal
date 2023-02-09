@@ -123,6 +123,12 @@ library
     , plutus-tx
     , text
     , transformers
+    , ply-plutarch
+    , data-default
+    , plutus-core
+    , cborg
+    , base16
+    , serialise
 
 test-suite cardano-dex-contracts-test
   type: exitcode-stdio-1.0
