@@ -49,8 +49,8 @@ instance DerivePlutusType RedeemConfig where type DPTStrat _ = PlutusTypeData
 instance PUnsafeLiftDecl RedeemConfig where type PLifted RedeemConfig = R.RedeemConfig
 deriving via (DerivePConstantViaData R.RedeemConfig RedeemConfig) instance (PConstantDecl R.RedeemConfig)
 
-redeemValidatorT :: ClosedTerm (RedeemConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
-redeemValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
+redeemValidatorT :: Term s PInteger -> Term s (RedeemConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
+redeemValidatorT teddyNum = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     ctx     <- pletFieldsC @'["txInfo", "purpose"] ctx'
     conf    <- pletFieldsC @'["x", "y", "lq", "poolNft", "exFee", "rewardPkh", "stakePkh"] conf'
     let
@@ -113,23 +113,21 @@ redeemValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     outs <- tlet $ calcOutput # rewardValue # x # y # collateralAda
     inLq <- tlet $ assetClassValueOf # selfValue # lq
 
+
     let 
         outAda = plovelaceValueOf # rewardValue
-        
         minReturnX = calcMinReturn # liquidity # inLq # poolValue # x
         minReturnY = calcMinReturn # liquidity # inLq # poolValue # y
-
         outX  = pfromData $ pfield @"_0" # outs
         outY  = pfromData $ pfield @"_1" # outs
         opAda = pfromData $ pfield @"_2" # outs
-
         fairShare = minReturnX #<= outX #&& minReturnY #<= outY
         fairFee = opAda + collateralAda #<= outAda
 
     action <- tletUnwrap $ getField @"action" redeemer
     pure $
         pmatch action $ \case
-            Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& fairShare #&& fairFee
+            Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& fairShare #&& fairFee #&& teddyNum #== teddyNum
             Refund ->
                 let sigs = pfromData $ getField @"signatories" txInfo
                  in containsSignature # sigs # rewardPkh
@@ -145,7 +143,6 @@ calcOutput :: Term s (PValue _ _:--> PAssetClass :--> PAssetClass :--> PInteger 
 calcOutput = plam $ \rewardValue poolX poolY collateralAda -> unTermCont $ do
     rx <- tlet $ assetClassValueOf # rewardValue # poolX
     ry <- tlet $ assetClassValueOf # rewardValue # poolY
-
     outX <- tlet $ rx - collateralAda
     outY <- tlet $ ry - collateralAda
 

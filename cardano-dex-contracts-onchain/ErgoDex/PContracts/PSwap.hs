@@ -53,8 +53,8 @@ instance DerivePlutusType SwapConfig where type DPTStrat _ = PlutusTypeData
 instance PUnsafeLiftDecl SwapConfig where type PLifted SwapConfig = S.SwapConfig
 deriving via (DerivePConstantViaData S.SwapConfig SwapConfig) instance (PConstantDecl S.SwapConfig)
 
-swapValidatorT :: ClosedTerm (SwapConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
-swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
+swapValidatorT :: Term s PInteger -> Term s (SwapConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
+swapValidatorT teddyNum = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     ctx    <- pletFieldsC @'["txInfo", "purpose"] ctx'
     conf   <- pletFieldsC @'["base", "quote", "poolNft", "feeNum", "exFeePerTokenNum", "exFeePerTokenDen", "rewardPkh", "stakePkh", "baseAmount", "minQuoteAmount"] conf'
     let
@@ -65,7 +65,7 @@ swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
         base   = getField @"base"   conf
         quote  = getField @"quote"  conf
         feeNum = getField @"feeNum" conf
-
+        
         exFeePerTokenNum = getField @"exFeePerTokenNum" conf
         exFeePerTokenDen = getField @"exFeePerTokenDen" conf
 
@@ -91,6 +91,7 @@ swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     poolValue <- 
         let pool = getField @"resolved" poolIn
          in tletField @"value" pool
+
     let poolIdentity =
             let nftAmount = assetClassValueOf # poolValue # requiredNft
              in nftAmount #== 1
@@ -102,6 +103,7 @@ swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
          in tletField @"value" self
 
     PSpending selfRef' <- tmatch (pfromData $ getField @"purpose" ctx)
+
     let 
         selfIdentity =
             let selfRef   = pfromData $ pfield @"_0" # selfRef'
@@ -118,19 +120,20 @@ swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
                 (pIsAda # quote)
                 (pdiv # (quoteDelta * exFeePerTokenDen) # (exFeePerTokenDen - exFeePerTokenNum))
                 quoteDelta
+
     fairExFee <-
         tlet $ 
             (pIsAda # quote) #|| (validExFee # rewardValue # selfValue # base # baseAmount # quoteAmount # exFeePerTokenNum # exFeePerTokenDen)
     let 
         strictInputs =
             let inputsLength = plength # inputs
-             in inputsLength #== 2 -- address double satisfaction attack
+            in inputsLength #== 2 
         minSatisfaction = minOutput #<= quoteAmount
         fairPrice = validPrice # quoteAmount # poolValue # base # quote # baseAmount # feeNum
 
     pure $
         pmatch action $ \case
-            Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& minSatisfaction #&& fairExFee #&& fairPrice
+            Apply ->  poolIdentity #&& selfIdentity #&& strictInputs #&& minSatisfaction #&& fairExFee #&& fairPrice #&& teddyNum #== teddyNum
             Refund ->
                 let sigs = pfromData $ getField @"signatories" txInfo
                  in containsSignature # sigs # rewardPkh
@@ -161,6 +164,7 @@ validExFee =
                 outAda   = plovelaceValueOf # rewardValue
                 inAda    = plovelaceValueOf # selfValue
                 exFee    = pdiv # (quoteAmount * exFeePerTokenNum) # exFeePerTokenDen
+
             pure $ (inAda - baseAda - exFee) #<= outAda
 
 validPrice ::
@@ -175,9 +179,10 @@ validPrice ::
             :--> PBool
         )
 validPrice =
-    plam $ \quoteAmount poolValue base quote baseAmount feeNum ->
+    plam $ \quoteAmount poolValue base quote baseAmount feeNum -> unTermCont $ do
         let relaxedOut    = quoteAmount + 1
             reservesBase  = assetClassValueOf # poolValue # base
             reservesQuote = assetClassValueOf # poolValue # quote
             correctOut    = pdiv # (reservesQuote * baseAmount * feeNum) # (reservesBase * feeDen + baseAmount * feeNum)
-         in correctOut #<= relaxedOut 
+
+        pure $ correctOut #<= relaxedOut 

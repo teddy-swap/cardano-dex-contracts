@@ -139,9 +139,9 @@ readPoolState = phoistAcyclic $
         
         let 
             x = pdata $ assetClassValueOf # value # poolX
-            y = pdata $ assetClassValueOf # value # poolY
-            negLq = assetClassValueOf # value # poolLq
-            lq = pdata $ maxLqCap - negLq
+            y = pdata $ assetClassValueOf # value # poolY 
+            negLq = assetClassValueOf # value # poolLq 
+            lq = pdata $ maxLqCap - negLq 
         tcon $
             PoolState $
                 pdcons @"reservesX" @PInteger # x
@@ -174,13 +174,13 @@ validSwap = phoistAcyclic $
         let
            dxf = dx * feeNum
            dyf = dy * feeNum
+
         pure $
             pif
                 (zero #< dx)
                 (-dy * (rx * feeDen' + dxf) #<= ry * dxf)
                 (-dx * (ry * feeDen' + dyf) #<= rx * dyf)
 
--- Guarantees preservation of pool NFT
 findPoolOutput :: Term s (PAssetClass :--> PBuiltinList PTxOut :--> PTxOut)
 findPoolOutput =
     phoistAcyclic $
@@ -193,8 +193,8 @@ findPoolOutput =
                 )
                 (const $ ptraceError "Pool output not found")
 
-poolValidatorT :: ClosedTerm (PoolConfig :--> PoolRedeemer :--> PScriptContext :--> PBool)
-poolValidatorT = plam $ \conf redeemer' ctx' -> unTermCont $ do
+poolValidatorT :: Term s PInteger -> Term s (PoolConfig :--> PoolRedeemer :--> PScriptContext :--> PBool)
+poolValidatorT teddyNum = plam $ \conf redeemer' ctx' -> unTermCont $ do
     redeemer <- pletFieldsC @'["action", "selfIx"] redeemer'
     let
         selfIx = getField @"selfIx" redeemer
@@ -214,30 +214,30 @@ poolValidatorT = plam $ \conf redeemer' ctx' -> unTermCont $ do
 
     pure $
         pmatch action $ \case
-            Destroy -> lq0 #<= burnLqInitial -- all tokens except for permanetly locked ones are removed
+            Destroy -> lq0 #<= burnLqInitial 
             _ -> unTermCont $ do
                 outputs <- tletUnwrap $ getField @"outputs" txInfo
                 nft     <- tletField @"poolNft" conf
 
-                successor <- tlet $ findPoolOutput # nft # outputs -- nft is preserved
-
+                successor <- tlet $ findPoolOutput # nft # outputs       
                 s1  <- tlet $ readPoolState # conf # successor
                 rx0 <- tletField @"reservesX" s0
                 rx1 <- tletField @"reservesX" s1
                 ry0 <- tletField @"reservesY" s0
                 ry1 <- tletField @"reservesY" s1
                 lq1 <- tletField @"liquidity" s1
-                let dx  = rx1 - rx0
-                    dy  = ry1 - ry0
-                    dlq = lq1 - lq0 -- pool keeps only the negative part of LQ tokens
+                let dx  = rx1 - rx0 
+                    dy  = ry1 - ry0 
+                    dlq = lq1 - lq0 
 
                 PSpending selfRef' <- pmatchC $ getField @"purpose" ctx
 
                 selfRef <- tletField @"_0" selfRef'
+
                 let 
                     selfInRef    = getField @"outRef" selfIn
-                    selfIdentity = selfRef #== selfInRef -- self is the output currently validated by this script
-
+                    selfIdentity = selfRef #== selfInRef 
+  
                 selfDatum <- tletField @"datum" self
                 succDatum <- tletField @"datum" successor
 
@@ -246,15 +246,17 @@ poolValidatorT = plam $ \conf redeemer' ctx' -> unTermCont $ do
 
                 selfD <- tletField @"outputDatum" selfD'
                 succD <- tletField @"outputDatum" succD'
+
                 let 
-                    confPreserved = selfD #== succD -- config preserved
+                    confPreserved = selfD #== succD 
 
                 selfAddr <- tletField @"address" self
                 succAddr <- tletField @"address" successor
                 let 
-                    scriptPreserved = succAddr #== selfAddr -- validator, staking cred preserved
+                    scriptPreserved = succAddr #== selfAddr 
+
                     validAction     = pmatch action $ \case
                         Swap -> dlq #== 0 #&& validSwap # conf # s0 # dx # dy
                         _ -> validDepositRedeem # s0 # dx # dy # dlq
 
-                pure $ selfIdentity #&& confPreserved #&& scriptPreserved #&& validAction
+                pure $ selfIdentity #&& confPreserved #&& scriptPreserved #&& validAction #&& teddyNum #== teddyNum
