@@ -49,8 +49,8 @@ instance DerivePlutusType RedeemConfig where type DPTStrat _ = PlutusTypeData
 instance PUnsafeLiftDecl RedeemConfig where type PLifted RedeemConfig = R.RedeemConfig
 deriving via (DerivePConstantViaData R.RedeemConfig RedeemConfig) instance (PConstantDecl R.RedeemConfig)
 
-redeemValidatorT :: ClosedTerm (RedeemConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
-redeemValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
+redeemValidatorT :: Term s PInteger -> Term s (RedeemConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
+redeemValidatorT teddyNum = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     ctx     <- pletFieldsC @'["txInfo", "purpose"] ctx'
     conf    <- pletFieldsC @'["x", "y", "lq", "poolNft", "exFee", "rewardPkh", "stakePkh"] conf'
     let
@@ -129,11 +129,12 @@ redeemValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
 
     action <- tletUnwrap $ getField @"action" redeemer
     pure $
-        pmatch action $ \case
+        (pmatch action $ \case
             Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& fairShare #&& fairFee
             Refund ->
                 let sigs = pfromData $ getField @"signatories" txInfo
                  in containsSignature # sigs # rewardPkh -- user signed the refund
+        ) #&& (teddyNum #== teddyNum)
 
 calcMinReturn :: Term s (PInteger :--> PInteger :--> PValue _ _:--> PAssetClass :--> PInteger)
 calcMinReturn =

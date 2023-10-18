@@ -52,8 +52,8 @@ instance DerivePlutusType DepositConfig where type DPTStrat _ = PlutusTypeData
 instance PUnsafeLiftDecl DepositConfig where type PLifted DepositConfig = D.DepositConfig
 deriving via (DerivePConstantViaData D.DepositConfig DepositConfig) instance (PConstantDecl D.DepositConfig)
 
-depositValidatorT :: ClosedTerm (DepositConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
-depositValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
+depositValidatorT :: Term s PInteger -> Term s (DepositConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
+depositValidatorT teddyNum = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     ctx  <- pletFieldsC @'["txInfo", "purpose"] ctx'
     conf <- pletFieldsC @'["x", "y", "lq", "poolNft", "exFee", "rewardPkh", "stakePkh", "collateralAda"] conf'
     let 
@@ -134,11 +134,12 @@ depositValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
              in minReward #<= actualReward
 
     pure $
-        pmatch action $ \case
+        (pmatch action $ \case
             Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& validChange #&& validReward
             Refund ->
                 let sigs = pfromData $ getField @"signatories" txInfo
                  in containsSignature # sigs # rewardPkh -- user signed the refund
+        ) #&& (teddyNum #== teddyNum)
 
 -- Checks whether an asset overflow is returned back to user
 validChange' :: Term s (PValue _ _ :--> PAssetClass :--> PInteger :--> PInteger :--> PInteger :--> PInteger :--> PBool)

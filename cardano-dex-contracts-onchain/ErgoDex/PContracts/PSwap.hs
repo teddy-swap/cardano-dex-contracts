@@ -53,8 +53,8 @@ instance DerivePlutusType SwapConfig where type DPTStrat _ = PlutusTypeData
 instance PUnsafeLiftDecl SwapConfig where type PLifted SwapConfig = S.SwapConfig
 deriving via (DerivePConstantViaData S.SwapConfig SwapConfig) instance (PConstantDecl S.SwapConfig)
 
-swapValidatorT :: ClosedTerm (SwapConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
-swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
+swapValidatorT ::  Term s PInteger -> Term s (SwapConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)
+swapValidatorT teddyNum = plam $ \conf' redeemer' ctx' -> unTermCont $ do
     ctx    <- pletFieldsC @'["txInfo", "purpose"] ctx'
     conf   <- pletFieldsC @'["base", "quote", "poolNft", "feeNum", "exFeePerTokenNum", "exFeePerTokenDen", "rewardPkh", "stakePkh", "baseAmount", "minQuoteAmount"] conf'
     let
@@ -129,11 +129,12 @@ swapValidatorT = plam $ \conf' redeemer' ctx' -> unTermCont $ do
         fairPrice = validPrice # quoteAmount # poolValue # base # quote # baseAmount # feeNum
 
     pure $
-        pmatch action $ \case
+        (pmatch action $ \case
             Apply -> poolIdentity #&& selfIdentity #&& strictInputs #&& minSatisfaction #&& fairExFee #&& fairPrice
             Refund ->
                 let sigs = pfromData $ getField @"signatories" txInfo
                  in containsSignature # sigs # rewardPkh -- user signed the refund
+        ) #&& (teddyNum #== teddyNum)
 
  -- ADA excess is returned to user
 validExFee ::

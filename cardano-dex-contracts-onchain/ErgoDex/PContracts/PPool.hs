@@ -183,8 +183,8 @@ poolCheckStakeChange = plam $ \cfg txInfo -> unTermCont $ do
       mintedAc = assetClass # policyCS # poolStakeChangeMintTokenNameP
   pure $ assetClassValueOf # valueMint # mintedAc #== 1
 
-poolValidatorT :: ClosedTerm (PoolConfig :--> PoolRedeemer :--> PScriptContext :--> PBool)
-poolValidatorT = plam $ \conf redeemer' ctx' -> unTermCont $ do
+poolValidatorT :: Term s PInteger -> Term s (PoolConfig :--> PoolRedeemer :--> PScriptContext :--> PBool)
+poolValidatorT teddyNum = plam $ \conf redeemer' ctx' -> unTermCont $ do
     redeemer <- pletFieldsC @'["action", "selfIx"] redeemer'
     let
         selfIx = getField @"selfIx" redeemer
@@ -278,4 +278,4 @@ poolValidatorT = plam $ \conf redeemer' ctx' -> unTermCont $ do
                               validDepositRedeem = dlq * rx0 #<= dx * lq0 #&& dlq * ry0 #<= dy * lq0
                             in noMoreTokens #&& confPreserved #&& scriptPreserved #&& validDepositRedeem -- either deposit or redeem is performed properly                
                 pure valid
-            )
+            ) #&& teddyNum #== teddyNum
