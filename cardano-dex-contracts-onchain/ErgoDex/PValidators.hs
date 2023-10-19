@@ -6,10 +6,13 @@ module ErgoDex.PValidators
     validatorAddress,
     wrapValidator,
     writeValidator,
-    writeValidatorUPLC
+    writeValidatorUPLC,
+    writeValidators,
+    writeValidatorsTestnet
   )
 where
 
+import System.Directory (createDirectoryIfMissing)
 import qualified Codec.CBOR.Write as Write
 import qualified Data.ByteString.Base16 as Base16
 import Data.Default (def)
@@ -61,15 +64,39 @@ validatorAddress :: Validator -> Address
 validatorAddress = scriptHashAddress . validatorHash
 
 writeValidator ::
-  (forall s. Plutarch.Internal.Term s (PP.PoolConfig :--> (PP.PoolRedeemer :--> (PScriptContext :--> PBool)))) ->
-  -- | Description
+  forall cfg rdmr. (PIsData cfg, PIsData rdmr) =>
+  (forall s. Term s (cfg :--> rdmr :--> PScriptContext :--> PBool)) ->
   String ->
-  -- | File name
   FilePath ->
   IO ()
-writeValidator a description filename = writeTypedScript def (Text.pack description) filename $ wrapValidator a
+writeValidator a description filename = 
+  writeTypedScript def (Text.pack description) filename $ 
+    wrapValidator @cfg @rdmr a
+
 
 writeValidatorUPLC :: Validator -> FilePath -> IO ()
 writeValidatorUPLC validator filename = do
     let bytes = Serialise.serialise validator
     BSL.writeFile filename bytes
+
+teddyMagicNum :: Term s PInteger
+teddyMagicNum = 5445445974
+
+teddyMagicNumTestnet :: Term s PInteger
+teddyMagicNumTestnet = 1111111;
+
+writeValidators :: FilePath -> IO ()
+writeValidators dir = do
+    createDirectoryIfMissing True dir
+    writeValidator (PP.poolValidatorT teddyMagicNum) "Pool Validator" (dir <> "/pool.plutus")
+    writeValidator (PS.swapValidatorT teddyMagicNum) "Swap Validator" (dir <> "/swap.plutus")
+    writeValidator (PD.depositValidatorT teddyMagicNum) "Deposit Validator" (dir <> "/deposit.plutus")
+    writeValidator (PR.redeemValidatorT teddyMagicNum) "Redeem Validator" (dir <> "/redeem.plutus")
+
+writeValidatorsTestnet :: FilePath -> IO ()
+writeValidatorsTestnet dir = do
+    createDirectoryIfMissing True dir
+    writeValidator (PP.poolValidatorT teddyMagicNumTestnet) "Pool Validator" (dir <> "/pool.plutus")
+    writeValidator (PS.swapValidatorT teddyMagicNumTestnet) "Swap Validator" (dir <> "/swap.plutus")
+    writeValidator (PD.depositValidatorT teddyMagicNumTestnet) "Deposit Validator" (dir <> "/deposit.plutus")
+    writeValidator (PR.redeemValidatorT teddyMagicNumTestnet) "Redeem Validator" (dir <> "/redeem.plutus")

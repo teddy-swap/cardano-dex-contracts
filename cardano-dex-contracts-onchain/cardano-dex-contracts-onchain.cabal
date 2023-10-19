@@ -134,6 +134,7 @@ library
     , plutus-core
     , cborg
     , serialise
+    , directory
 
 test-suite cardano-dex-contracts-test
   type: exitcode-stdio-1.0
