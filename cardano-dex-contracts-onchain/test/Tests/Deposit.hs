@@ -80,7 +80,7 @@ successDeposit = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -108,7 +108,7 @@ successDepositXIsAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -136,7 +136,7 @@ successDepositYIsAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -164,7 +164,7 @@ incorrectChangeWithAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -191,7 +191,7 @@ incorrectPoolInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 1 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -218,7 +218,7 @@ incorrectOrderInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 0 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -245,7 +245,7 @@ incorrectRewardOutIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 0
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -272,7 +272,7 @@ incorrectSelfIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -299,7 +299,7 @@ incorrectPoolIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -326,7 +326,7 @@ lqIsLessThanMin = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -354,7 +354,7 @@ lqOutTokenIsIncorrect = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -381,6 +381,6 @@ incorrectTokenReward = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkDepositRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PDeposit.depositValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PDeposit.depositValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()

@@ -66,7 +66,7 @@ successRedeem = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -94,7 +94,7 @@ successRedeemXAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -122,7 +122,7 @@ successRedeemYAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -149,7 +149,7 @@ redeemIncorrectPoolInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 1 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -176,7 +176,7 @@ redeemIncorrectOrderInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 0 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -203,7 +203,7 @@ redeemIncorrectRewardOutIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 0
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -230,7 +230,7 @@ redeemSelfIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -257,7 +257,7 @@ redeemPoolIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -284,7 +284,7 @@ redeemFairFee = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -311,7 +311,7 @@ redeemFairShareX = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -338,6 +338,6 @@ redeemFairShareY = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PRedeem.redeemValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PRedeem.redeemValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()

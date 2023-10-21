@@ -79,7 +79,7 @@ poolDestroyCheck lqQty expected = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Destroy
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === expected
 
@@ -102,7 +102,7 @@ poolDestroyCheckIncorrectPoolInput lqQty = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Destroy
 
-    result = eraseLeft $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseLeft $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -129,7 +129,7 @@ successPoolRedeem = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Redeem
 
-    result = eraseRight $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -156,7 +156,7 @@ poolRedeemLqCheck xQty yQty lqOutQty = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Redeem
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -183,7 +183,7 @@ poolRedeemRedeemerIncorrectIx = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 1 Pool.Redeem
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -210,7 +210,7 @@ poolRedeemRedeemerIncorrectAction action = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 action
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -237,7 +237,7 @@ successPoolSwap = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Swap
 
-    result = eraseRight $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -266,7 +266,7 @@ incorrectPoolTokensQtyInFinalValue = withTests 1 $ property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Swap
 
-    result = eraseLeft $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseLeft $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -294,7 +294,7 @@ incorrectPoolSwapAdditionalTokens = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Swap
 
-    result = eraseLeft $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseLeft $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -321,7 +321,7 @@ poolSwapInsufficientLiqudityForBound = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Swap
 
-    result = eraseLeft $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseLeft $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -348,7 +348,7 @@ poolSwapRedeemerIncorrectIx = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 1 Pool.Swap
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -375,7 +375,7 @@ poolSwapRedeemerIncorrectAction action = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 action
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -402,7 +402,7 @@ successPoolDeposit = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.Deposit
 
-    result = eraseRight $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -433,7 +433,7 @@ successPoolChangeStakePartCorrectMinting = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.ChangeStakingPool
 
-    result = eraseRight $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -462,7 +462,7 @@ failedPoolChangeStakePartIncorrectMinting = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 Pool.ChangeStakingPool
 
-    result = eraseLeft $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseLeft $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -490,7 +490,7 @@ poolDepositRedeemerIncorrectIx = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 1 Pool.Deposit
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -518,6 +518,6 @@ poolDepositRedeemerIncorrectAction action = property $ do
     cxtToData        = toData $ mkContext txInfo purpose
     poolRedeemToData = toData $ mkPoolRedeemer 0 action
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PPool.poolValidatorT) [pcfg, poolRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PPool.poolValidatorT 1234)) [pcfg, poolRedeemToData, cxtToData]
 
   result === Left ()

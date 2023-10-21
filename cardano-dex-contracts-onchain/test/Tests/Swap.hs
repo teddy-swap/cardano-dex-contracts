@@ -62,7 +62,7 @@ successSwap = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -90,7 +90,7 @@ successSwapWithXIsAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -118,7 +118,7 @@ successSwapWithYIsAda = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseRight $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseRight $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Right ()
 
@@ -145,7 +145,7 @@ invalidFairPrice = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -172,7 +172,7 @@ invalidExFee = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -199,7 +199,7 @@ swapSelfIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -226,7 +226,7 @@ swapPoolIdentity = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -253,7 +253,7 @@ swapIncorrectPoolInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 1 1 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -280,7 +280,7 @@ swapIncorrectOrderInIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 0 1
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
 
@@ -307,6 +307,6 @@ swapIncorrectRewardOutIx = property $ do
     cxtToData          = toData $ mkContext txInfo purpose
     orderRedeemToData  = toData $ mkOrderRedeemer 0 1 0
 
-    result = eraseBoth $ evalWithArgs (wrapValidator PSwap.swapValidatorT) [cfgData, orderRedeemToData, cxtToData]
+    result = eraseBoth $ evalWithArgs (wrapValidator (PSwap.swapValidatorT 1234)) [cfgData, orderRedeemToData, cxtToData]
 
   result === Left ()
