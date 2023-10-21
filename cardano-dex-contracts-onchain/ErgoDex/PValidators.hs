@@ -8,7 +8,8 @@ module ErgoDex.PValidators
     writeValidator,
     writeValidatorUPLC,
     writeValidators,
-    writeValidatorsTestnet
+    writeValidatorsTestnet,
+    writeValidatorsUPLC
   )
 where
 
@@ -49,16 +50,16 @@ wrapValidator validator = plam $ \datum redeemer ctx ->
    in popaque $ pif result (pcon PUnit) (ptraceError "Validator reduced to False")
 
 poolValidator :: Validator
-poolValidator = mkValidator cfgForValidator $ wrapValidator $ PP.poolValidatorT 5445445974
+poolValidator = mkValidator cfgForValidator $ wrapValidator $ PP.poolValidatorT teddyMagicNum
 
 swapValidator :: Validator
-swapValidator = mkValidator cfgForValidator $ wrapValidator $ PS.swapValidatorT 5445445974
+swapValidator = mkValidator cfgForValidator $ wrapValidator $ PS.swapValidatorT teddyMagicNum
 
 depositValidator :: Validator
-depositValidator = mkValidator cfgForValidator $ wrapValidator $ PD.depositValidatorT 5445445974
+depositValidator = mkValidator cfgForValidator $ wrapValidator $ PD.depositValidatorT teddyMagicNum
 
 redeemValidator :: Validator
-redeemValidator = mkValidator cfgForValidator $ wrapValidator $ PR.redeemValidatorT 5445445974
+redeemValidator = mkValidator cfgForValidator $ wrapValidator $ PR.redeemValidatorT teddyMagicNum
 
 validatorAddress :: Validator -> Address
 validatorAddress = scriptHashAddress . validatorHash
@@ -100,3 +101,11 @@ writeValidatorsTestnet dir = do
     writeValidator (PS.swapValidatorT teddyMagicNumTestnet) "Swap Validator" (dir <> "/swap.plutus")
     writeValidator (PD.depositValidatorT teddyMagicNumTestnet) "Deposit Validator" (dir <> "/deposit.plutus")
     writeValidator (PR.redeemValidatorT teddyMagicNumTestnet) "Redeem Validator" (dir <> "/redeem.plutus")
+
+writeValidatorsUPLC :: FilePath -> IO ()
+writeValidatorsUPLC dir = do
+    createDirectoryIfMissing True dir
+    writeValidatorUPLC poolValidator (dir <> "/pool.uplc")
+    writeValidatorUPLC swapValidator (dir <> "/swap.uplc")
+    writeValidatorUPLC depositValidator (dir <> "/deposit.uplc")
+    writeValidatorUPLC redeemValidator (dir <> "/redeem.uplc")
